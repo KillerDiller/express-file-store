@@ -1,27 +1,30 @@
 var fs = require('fs');
+var join = require('path').join;
 var FileStore = require('..');
 var assert = require('assert');
 var rimraf = require('rimraf');
 
 describe('FS Backend', function() {
   
+  const testdir = join(__dirname, 'test');
+
   before(function() {
     try {
-      fs.unlinkSync(__dirname + '/test');
-      fs.mkdirSync(__dirname + '/test');
+      fs.unlinkSync(testdir);
+      fs.mkdirSync(testdir);
     } catch(e) {}
-    this.backend = FileStore('fs', __dirname + '/test');
+    this.backend = FileStore('fs', testdir);
   });
   
   after(function(done) {
-    rimraf(__dirname + '/test', done);
+    rimraf(testdir, done);
   });
   
   it('#put', function(done) {
     this.backend.put({
       filename: 'a/b/c.js',
       contentType: 'application/javascript',
-      stream: fs.createReadStream(__dirname + '/fs.js')
+      stream: fs.createReadStream(join(__dirname, 'fs.js'))
     }, function(err) {
       assert(!err);
       done();
@@ -31,9 +34,10 @@ describe('FS Backend', function() {
   it('#get', function(done) {
     this.backend.get('a/b/c.js', function(err, file) {
       assert(!err);
-      assert.equal(file.filename, 'a/b/c.js');
+      assert.equal(file.filename, join('a', 'b', 'c.js'));
       assert.equal(file.contentType, 'application/javascript');
       assert(!!file.stream);
+      file.stream.close();
       done();
     });
   });
@@ -48,7 +52,7 @@ describe('FS Backend', function() {
   it('#remove', function(done) {
     this.backend.remove('a/b/c.js', function(err) {
       assert(!err);
-      assert(!fs.existsSync(__dirname + '/test/a/b/c.js'));
+      assert(!fs.existsSync(join(testdir, 'a', 'b', 'c.js')));
       done();
     });
   });

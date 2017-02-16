@@ -1,3 +1,4 @@
+var join = require('path').join;
 var request = require('supertest');
 var assert = require('assert');
 var FileStore = require('..');
@@ -18,32 +19,32 @@ describe('Routes', function() {
     });
   });
   
-  it('#POST', function(done) {
+  it('#post', function(done) {
     request(this.app)
       .post('/a/b/c.js')
-      .attach('file', __dirname + '/routes.js')
-      .expect(200)
+      .attach('file', join(__dirname, 'routes.js'))
+      .expect(201)
       .end(done);
   });
   
-  it('#GET', function(done) {
+  it('#get', function(done) {
     request(this.app)
       .get('/a/b/c.js')
       .expect(200)
       .end(done);
   });
   
-  it('#GET (missing)', function(done) {
+  it('#get (missing)', function(done) {
     request(this.app)
       .get('/a/b/d.js')
       .expect(404)
       .end(done);
   });
   
-  it('#DELETE', function(done) {
+  it('#delete', function(done) {
     request(this.app)
-      .get('/a/b/c.js')
-      .expect(200)
+      .delete('/a/b/c.js')
+      .expect(204)
       .end(done);
   });
 });
